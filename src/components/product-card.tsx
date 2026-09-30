@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { ProductCard as ProductCardData } from "@/lib/data/storefront";
 import type { Settings } from "@/lib/settings/schema";
-import { AddToCartButton, ConsultButton, Price, ProductImage, RxBadge, StockNote, consultLink } from "./product-bits";
+import { AddToCartButton } from "./cart/add-to-cart-button";
+import { ConsultButton, Price, ProductImage, RxBadge, StockNote, cartProduct, consultLink } from "./product-bits";
 
 export function ProductCard({ product, settings }: { product: ProductCardData; settings: Settings }) {
   const consult = consultLink(product, settings);
@@ -23,7 +24,11 @@ export function ProductCard({ product, settings }: { product: ProductCardData; s
       <div className="mt-auto flex items-center justify-between gap-2 pt-4">
         <Price product={product} settings={settings} />
         <div className="relative z-10">
-          {consult ? <ConsultButton href={consult.href} label={consult.label} /> : <AddToCartButton />}
+          {consult ? (
+            <ConsultButton href={consult.href} label={consult.label} />
+          ) : (
+            <AddToCartButton product={cartProduct(product, categorySlug)} />
+          )}
         </div>
       </div>
     </article>

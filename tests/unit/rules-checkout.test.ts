@@ -1,7 +1,7 @@
 // Ported from the WordPress build's tests/m2-rules.php (product rules and checkout validation).
 import { describe, expect, it } from "vitest";
 import { canBuyOnline, hasPharmacyOnly, productAction, showPrice } from "@/lib/domain/product-rules";
-import { checkoutSchema } from "@/lib/domain/checkout";
+import { checkoutFieldErrors, checkoutSchema } from "@/lib/domain/checkout";
 
 const general = { rx_class: "general", in_stock: true } as const;
 const outOfStock = { rx_class: "general", in_stock: false } as const;
@@ -70,5 +70,17 @@ describe("checkout validation", () => {
   it("email is optional but must be valid when given", () => {
     expect(checkoutSchema.parse({ ...base, address: "x", email: "" }).email).toBeUndefined();
     expect(errorsFor({ ...base, address: "x", email: "not an email" })).toContain("email");
+  });
+});
+
+describe("checkoutFieldErrors", () => {
+  it("reports every problem in one round, including the address", () => {
+    expect(Object.keys(checkoutFieldErrors({ fulfilment: "delivery" })).sort()).toEqual(
+      ["address", "customer_name", "delivery_area_id", "phone"].sort(),
+    );
+  });
+
+  it("does not ask for an address on pick-up", () => {
+    expect(checkoutFieldErrors({ fulfilment: "pickup" })).not.toHaveProperty("address");
   });
 });

@@ -5,12 +5,13 @@ import { Suspense } from "react";
 import { PhoneIcon, WhatsAppIcon } from "@/components/icons";
 import { WhenClosed } from "@/components/open-status";
 import { ProductGrid } from "@/components/product-card";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import {
-  AddToCartButton,
   ConsultButton,
   Price,
   ProductImage,
   RxBadge,
+  cartProduct,
   consultLink,
 } from "@/components/product-bits";
 import { Prose } from "@/components/sections";
@@ -102,7 +103,9 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
           )}
 
           <div className="mt-6 flex flex-wrap gap-3">
-            {consult ? <ConsultButton href={consult.href} label={consult.label} size="lg" /> : <AddToCartButton size="lg" />}
+            {consult ? <ConsultButton href={consult.href} label={consult.label} size="lg" /> : (
+              <AddToCartButton product={cartProduct(product, category?.slug ?? "")} size="lg" />
+            )}
           </div>
 
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">

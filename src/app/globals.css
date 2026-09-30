@@ -29,11 +29,30 @@
 
 :root {
   color-scheme: light;
+  /* Keep focused fields and anchors clear of the floating dock at the bottom of the screen. */
+  scroll-padding-bottom: 7rem;
 }
 
 body {
   background: var(--color-paper);
   color: var(--color-ink);
+}
+
+/*
+ * Page-driven chrome, decided by CSS instead of reading the URL (which would stop pages prerendering):
+ * checkout and order pages hide the floating dock; the home page hides the header's search box.
+ */
+body:has([data-no-dock]) [data-dock] {
+  display: none;
+}
+body:has([data-home-search]) [data-header-search] {
+  display: none;
+}
+@media (width >= 48rem) {
+  body:has([data-home-search]) [data-header-search] {
+    display: block;
+    visibility: hidden;
+  }
 }
 
 /* One visible, consistent focus style for keyboard users. */
@@ -63,6 +82,25 @@ body {
 @media (prefers-reduced-motion: no-preference) {
   .cross-lit {
     animation: cross-on 700ms ease-out both;
+  }
+}
+
+/* Cart count badge: a small bump when something is added. */
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cart-bump {
+    animation: bump 380ms ease-out;
   }
 }
 

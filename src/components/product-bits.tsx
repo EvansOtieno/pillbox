@@ -2,6 +2,7 @@ import { formatKes } from "@/lib/domain/money";
 import { productAction, showPrice, type RxClass } from "@/lib/domain/product-rules";
 import { whatsappUrl } from "@/lib/domain/contact";
 import { fillTemplate } from "@/lib/domain/template";
+import type { CartProduct } from "@/lib/cart/cart-logic";
 import type { Settings } from "@/lib/settings/schema";
 import { SITE_URL } from "@/lib/site";
 import { CategoryIcon, WhatsAppIcon } from "./icons";
@@ -80,7 +81,7 @@ export function ConsultButton({ href, label, size = "md" }: { href: string; labe
       target="_blank"
       rel="noopener"
       className={`inline-flex items-center justify-center gap-2 rounded-full border-2 border-brand font-bold text-brand transition hover:bg-brand hover:text-white active:scale-95 ${
-        size === "lg" ? "h-12 px-6" : "h-10 px-4 text-sm"
+        size === "lg" ? "h-12 px-6" : "h-11 px-4 text-sm"
       }`}
     >
       <WhatsAppIcon className="size-4.5" />
@@ -89,18 +90,17 @@ export function ConsultButton({ href, label, size = "md" }: { href: string; labe
   );
 }
 
-/** Placeholder until the cart arrives in Milestone 3. */
-export function AddToCartButton({ size = "md" }: { size?: "md" | "lg" }) {
-  return (
-    <button
-      type="button"
-      disabled
-      title="The cart arrives in Milestone 3"
-      className={`inline-flex items-center justify-center rounded-full bg-brand font-bold text-white opacity-60 ${
-        size === "lg" ? "h-12 px-8" : "h-10 px-4 text-sm"
-      }`}
-    >
-      Add to cart
-    </button>
-  );
+/** What the cart needs to know about a product (serialisable, passed to the client button). */
+export function cartProduct(
+  product: { id: number; slug: string; name: string; price_kes: number; rx_class: RxClass },
+  categorySlug: string,
+): CartProduct {
+  return {
+    productId: product.id,
+    slug: product.slug,
+    name: product.name,
+    priceKes: product.price_kes,
+    rxClass: product.rx_class,
+    categorySlug,
+  };
 }

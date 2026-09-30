@@ -76,6 +76,19 @@ page can't know the current time.
 - "Open now" and the lit cross are Client Components reading the browser clock (`useSyncExternalStore`), because a
   cached page can't know the time.
 
+### Cart and checkout (Milestone 3)
+- **Cart = browser state.** `src/lib/cart/store.ts` is a Zustand store (a tiny global state container, think of a
+  singleton bean components subscribe to) persisted to `localStorage`. The rules are pure functions in
+  `cart-logic.ts`, unit-tested like any service class. The server never trusts cart prices: `place_order` re-checks them.
+- **Checkout** posts to a Server Action (`checkout/actions.ts`) via `useActionState`, which gives the form the
+  action's last result (errors or the new order's token) plus a `pending` flag for the button.
+- Gotcha: a `<form action={…}>` is **reset by React after every submit**, wiping typed fields when the order is
+  rejected. The checkout submits in `onSubmit` with `startTransition(() => formAction(data))` instead.
+- Gotcha: `usePathname()` in a shared layout makes every dynamic route unprerenderable. Page-specific chrome (hide the
+  dock on checkout) is done with CSS `:has()` and a `data-no-dock` marker on the page instead.
+- **Confirmation** (`/order/[token]`) is the one uncached page: it reads the order at request time (`connection()`)
+  inside `<Suspense>`, builds the WhatsApp message with `orderMessage()` and shows it as a preview.
+
 ## 6. Supabase in one paragraph
 Supabase is a Postgres database plus services around it: **Auth** (GoTrue: sign-in, issues a JWT),
 **PostgREST** (the HTTP API over your schema), **Storage** (S3-like buckets for product images), and **Studio**

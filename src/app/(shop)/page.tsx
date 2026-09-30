@@ -34,7 +34,7 @@ export default async function HomePage() {
               {settings.hero_title}
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted">{settings.hero_text}</p>
-            <div className="mt-8 max-w-xl">
+            <div data-home-search className="mt-8 max-w-xl">
               <SearchForm id="home-search" placeholder={settings.search_placeholder} />
             </div>
             <ul className="mt-8 grid gap-2 text-[0.95rem] sm:grid-cols-1">

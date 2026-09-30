@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { normaliseMsisdn } from "./contact";
 
+const ADDRESS_REQUIRED = "Please enter a delivery address, or choose pick-up.";
+
 /**
  * Checkout form validation (the friendly first line of defence; place_order() re-checks everything).
  * Short form for a pay-on-delivery pharmacy in Nairobi: name, Kenyan mobile, optional email,
@@ -31,10 +33,24 @@ export const checkoutSchema = z
   })
   .superRefine((v, ctx) => {
     if (v.fulfilment === "delivery" && v.address === "") {
-      ctx.addIssue({ code: "custom", path: ["address"], message: "Please enter a delivery address, or choose pick-up." });
+      ctx.addIssue({ code: "custom", path: ["address"], message: ADDRESS_REQUIRED });
     }
   })
   .transform((v) => ({ ...v, address: v.fulfilment === "pickup" ? "" : v.address }));
+
+/**
+ * Every field error at once, keyed by field name. zod skips the cross-field address rule until the
+ * other fields are valid, so it is checked here too: the shopper sees all problems in one round.
+ */
+export function checkoutFieldErrors(values: Record<string, unknown>): Record<string, string> {
+  const out: Record<string, string> = {};
+  const result = checkoutSchema.safeParse(values);
+  if (!result.success) {
+    for (const issue of result.error.issues) out[String(issue.path[0] ?? "form")] ??= issue.message;
+  }
+  if (values.fulfilment === "delivery" && String(values.address ?? "").trim() === "") out.address ??= ADDRESS_REQUIRED;
+  return out;
+}
 
 export type CheckoutInput = z.input<typeof checkoutSchema>;
 export type CheckoutData = z.output<typeof checkoutSchema>;

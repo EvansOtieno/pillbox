@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getSettings } from "@/lib/data/storefront";
 import { hoursFrom } from "@/lib/site";
-import { HideOnHome } from "./hide-on-home";
 import { MenuIcon, SearchIcon } from "./icons";
 import { OpenBadge, StoreCross } from "./open-status";
 
@@ -50,9 +49,10 @@ export async function SiteHeader() {
           <span className="text-xl leading-none font-extrabold tracking-tight">{settings.store_name}</span>
         </Link>
 
-        <HideOnHome className="col-span-3 row-start-2 md:col-span-1 md:col-start-2 md:row-start-1">
+        {/* Steps aside on the home page, which has its own big search (see globals.css). */}
+        <div data-header-search className="col-span-3 row-start-2 md:col-span-1 md:col-start-2 md:row-start-1">
           <SearchForm id="header-search" placeholder={settings.search_placeholder} />
-        </HideOnHome>
+        </div>
 
         <div className="col-start-3 row-start-1 flex items-center justify-end gap-5">
           <OpenBadge hours={hours} className="hidden text-sm whitespace-nowrap text-muted xl:inline-flex" />
@@ -69,7 +69,7 @@ export async function SiteHeader() {
           </nav>
           {/* Mobile menu without JavaScript: <details> opens and closes natively. */}
           <details className="relative md:hidden">
-            <summary className="flex size-10 cursor-pointer list-none items-center justify-center rounded-full border border-line [&::-webkit-details-marker]:hidden">
+            <summary className="flex size-11 cursor-pointer list-none items-center justify-center rounded-full border border-line [&::-webkit-details-marker]:hidden">
               <MenuIcon className="size-5" />
               <span className="sr-only">Menu</span>
             </summary>

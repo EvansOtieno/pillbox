@@ -1,6 +1,8 @@
+import { CartDrawer } from "@/components/cart/cart-drawer";
 import { ContactDock } from "@/components/contact-dock";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getSettings } from "@/lib/data/storefront";
 
 // (shop) is a route group: it shares this layout without adding "/shop" to the URLs.
 export default function ShopLayout({ children }: LayoutProps<"/">) {
@@ -18,6 +20,13 @@ export default function ShopLayout({ children }: LayoutProps<"/">) {
       </main>
       <SiteFooter />
       <ContactDock />
+      <Cart />
     </>
   );
+}
+
+// Server wrapper: reads the notice text from settings, then hands it to the client-side drawer.
+async function Cart() {
+  const settings = await getSettings();
+  return <CartDrawer pharmacyOnlyNotice={settings.p_medicine_notice} />;
 }

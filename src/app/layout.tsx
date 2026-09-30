@@ -19,6 +19,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#0b5d46",
+  // Lets env(safe-area-inset-*) report the home-bar area, so the floating dock can sit above it.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
