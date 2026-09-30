@@ -64,6 +64,18 @@ the very next render) or `revalidateTag('products', 'max')` (stale-while-revalid
 That is `@CacheEvict` with named keys. This is also why "open now" is decided **in the browser**: a cached
 page can't know the current time.
 
+### How the storefront uses this (Milestone 2)
+- All public reads live in `src/lib/data/storefront.ts`: each is `'use cache'` + `cacheLife('max')` + a tag from
+  `src/lib/data/tags.ts` (`settings`, `catalogue`, `product:<slug>`, `delivery`, `faqs`). No page talks to Supabase directly.
+- `next build` prerenders ~170 pages (every product and category via `generateStaticParams`). Visitors get static HTML;
+  the database is only asked again when a tag is revalidated.
+- Pages that depend on the URL's query (`/shop?category=…`, `/search?q=…`) prerender their frame and stream the
+  results inside `<Suspense>`: the build output marks them ◐ (partial prerender).
+- **Soft 404s:** because the frame streams first with HTTP 200, a missing product shows the not-found page with a
+  `noindex` tag instead of a 404 status. Unknown URLs (no matching route) still return a real 404.
+- "Open now" and the lit cross are Client Components reading the browser clock (`useSyncExternalStore`), because a
+  cached page can't know the time.
+
 ## 6. Supabase in one paragraph
 Supabase is a Postgres database plus services around it: **Auth** (GoTrue: sign-in, issues a JWT),
 **PostgREST** (the HTTP API over your schema), **Storage** (S3-like buckets for product images), and **Studio**

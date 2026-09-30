@@ -1,6 +1,6 @@
 // Ported from the WordPress build's tests/m3-sections.php.
 import { describe, expect, it } from "vitest";
-import { dayRanges, formatTime, hoursLine } from "@/lib/domain/hours";
+import { dayRanges, formatTime, hoursLine, openStatus } from "@/lib/domain/hours";
 import { deliveryFeesText, deliverySummary, sortDeliveryOptions } from "@/lib/domain/delivery";
 import { faqParts, faqPlainText, faqSchema } from "@/lib/domain/faq";
 
@@ -28,6 +28,25 @@ describe("formatTime / hoursLine", () => {
     expect(hoursLine({ days: [1, 2, 3, 4, 5, 6, 7], open: "08:30", close: "20:00" })).toBe(
       "Mon–Sun 8:30 AM – 8:00 PM",
     );
+  });
+});
+
+describe("openStatus", () => {
+  const weekdays = { days: [1, 2, 3, 4, 5], open: "08:00", close: "21:00" };
+  const nairobi = (local: string) => new Date(`${local}:00+03:00`);
+
+  it.each([
+    ["2026-09-23T12:00", true, "Open until 9:00 PM"], // Wednesday midday
+    ["2026-09-23T07:15", false, "Closed. Opens today at 8:00 AM"],
+    ["2026-09-23T21:00", false, "Closed. Opens tomorrow at 8:00 AM"],
+    ["2026-09-25T22:00", false, "Closed. Opens Monday at 8:00 AM"], // Friday night
+    ["2026-09-27T10:00", false, "Closed. Opens tomorrow at 8:00 AM"], // Sunday
+  ])("%s → %s, %s", (local, open, label) => {
+    expect(openStatus(weekdays, nairobi(local))).toEqual({ open, label });
+  });
+
+  it("says Closed when no days are set", () => {
+    expect(openStatus({ ...weekdays, days: [] }, nairobi("2026-09-23T12:00")).label).toBe("Closed");
   });
 });
 

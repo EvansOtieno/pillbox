@@ -1,0 +1,106 @@
+import { formatKes } from "@/lib/domain/money";
+import { productAction, showPrice, type RxClass } from "@/lib/domain/product-rules";
+import { whatsappUrl } from "@/lib/domain/contact";
+import { fillTemplate } from "@/lib/domain/template";
+import type { Settings } from "@/lib/settings/schema";
+import { SITE_URL } from "@/lib/site";
+import { CategoryIcon, WhatsAppIcon } from "./icons";
+
+/* Small pieces shared by product cards and the product page. */
+
+export function RxBadge({ rxClass }: { rxClass: RxClass }) {
+  if (rxClass === "pharmacy_only") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-md bg-pmed-bg px-2 py-0.5 text-xs font-bold text-pmed"
+        title="A pharmacist confirms this medicine before dispatch"
+      >
+        <span aria-hidden="true">P</span> Pharmacy-only
+      </span>
+    );
+  }
+  if (rxClass === "prescription_only") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-md bg-rx-bg px-2 py-0.5 text-xs font-bold text-rx"
+        title="Needs a prescription: not sold online"
+      >
+        <span aria-hidden="true">℞</span> Prescription
+      </span>
+    );
+  }
+  return null;
+}
+
+export function StockNote({ inStock }: { inStock: boolean }) {
+  return inStock ? null : <span className="text-xs font-bold text-muted">Out of stock</span>;
+}
+
+export function Price({
+  product,
+  settings,
+  className = "",
+}: {
+  product: { price_kes: number; rx_class: RxClass; in_stock: boolean };
+  settings: Settings;
+  className?: string;
+}) {
+  return showPrice(product, settings.hide_rx_price) ? (
+    <span className={`font-extrabold tabular-nums ${className}`}>{formatKes(product.price_kes)}</span>
+  ) : (
+    <span className={`text-sm font-bold text-muted ${className}`}>{settings.rx_price_label}</span>
+  );
+}
+
+/** Placeholder "packshot" until product photos are uploaded: the category mark on a tinted tile. */
+export function ProductImage({ categorySlug, className = "" }: { categorySlug: string; className?: string }) {
+  return (
+    <div className={`flex items-center justify-center bg-mist text-brand/70 ${className}`}>
+      <CategoryIcon slug={categorySlug} className="h-2/5 w-auto" strokeWidth={1.2} />
+    </div>
+  );
+}
+
+/** WhatsApp link for "Consult pharmacist" / "Ask a pharmacist", or null when the product can be bought. */
+export function consultLink(product: { name: string; slug: string; rx_class: RxClass; in_stock: boolean }, settings: Settings) {
+  const action = productAction(product);
+  if (action.kind === "add_to_cart") return null;
+  const text = fillTemplate(settings[action.messageKey], {
+    store: settings.store_name,
+    product: product.name,
+    url: `${SITE_URL}/product/${product.slug}`,
+  });
+  return { label: action.label, href: whatsappUrl(settings.whatsapp_number, text) };
+}
+
+export function ConsultButton({ href, label, size = "md" }: { href: string; label: string; size?: "md" | "lg" }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener"
+      className={`inline-flex items-center justify-center gap-2 rounded-full border-2 border-brand font-bold text-brand transition hover:bg-brand hover:text-white active:scale-95 ${
+        size === "lg" ? "h-12 px-6" : "h-10 px-4 text-sm"
+      }`}
+    >
+      <WhatsAppIcon className="size-4.5" />
+      {label}
+    </a>
+  );
+}
+
+/** Placeholder until the cart arrives in Milestone 3. */
+export function AddToCartButton({ size = "md" }: { size?: "md" | "lg" }) {
+  return (
+    <button
+      type="button"
+      disabled
+      title="The cart arrives in Milestone 3"
+      className={`inline-flex items-center justify-center rounded-full bg-brand font-bold text-white opacity-60 ${
+        size === "lg" ? "h-12 px-8" : "h-10 px-4 text-sm"
+      }`}
+    >
+      Add to cart
+    </button>
+  );
+}
