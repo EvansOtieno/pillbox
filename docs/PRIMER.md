@@ -155,8 +155,11 @@ so use a second tab for everything else.
 | `pnpm dev` | Dev server on http://localhost:3000 (hot reload) |
 | `pnpm db:start` / `db:stop` / `db:status` | Local Supabase in Docker; `status` prints URLs and keys |
 | `pnpm db:reset` | Drop, re-run all migrations and `seed.sql` (Flyway clean + migrate) |
-| `pnpm db:types` | Generate TypeScript types from the schema (like JPA metamodel / jOOQ codegen) |
-| `pnpm test` / `test:watch` | Vitest unit tests (JUnit equivalent) |
+| `pnpm db:types` | Generate TypeScript types from the schema (like JPA metamodel / jOOQ codegen); run after changing a migration |
+| `pnpm seed:generate` | Rebuild `supabase/seed.sql` from `scripts/` (fictional catalogue and content), then `db:reset` |
+| `pnpm test` / `test:watch` | Vitest unit tests (JUnit equivalent): pure logic, no database |
+| `pnpm test:db` | pgTAP tests inside Postgres (`supabase/tests/`): `place_order` rules, RLS, search |
+| `pnpm test:integration` | Vitest against the running local Supabase API: the storefront's real data path |
 | `pnpm e2e` | Playwright browser tests (starts the dev server itself) |
 | `pnpm lint` / `typecheck` | ESLint / TypeScript compiler check |
 

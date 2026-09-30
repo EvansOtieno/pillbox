@@ -1,0 +1,4 @@
+-- Copy to supabase/seed.local.sql (git-ignored) and put your own numbers in.
+-- Applied after seed.sql on every `pnpm db:reset`.
+update public.settings set value = to_jsonb('2547XXXXXXXX'::text) where key = 'whatsapp_number';
+update public.settings set value = to_jsonb('07XX XXX XXX'::text) where key = 'call_number';

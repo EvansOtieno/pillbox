@@ -52,3 +52,6 @@ next-env.d.ts
 # private working notes (client context, machine setup): kept local only
 /CLAUDE.md
 /docs/PLAN.md
+
+# local seed with real phone numbers
+/supabase/seed.local.sql

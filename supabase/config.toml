@@ -67,7 +67,8 @@ schema_paths = []
 enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-sql_paths = ["./seed.sql"]
+# seed.local.sql is optional and git-ignored: your real WhatsApp/call numbers for local testing.
+sql_paths = ["./seed.sql", "./seed.local*.sql"]
 
 [db.network_restrictions]
 # Enable management of network restrictions.
