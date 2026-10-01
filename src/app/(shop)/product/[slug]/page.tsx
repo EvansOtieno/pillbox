@@ -76,7 +76,13 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
       </nav>
 
       <div className="grid gap-10 md:grid-cols-2">
-        <ProductImage categorySlug={category?.slug ?? ""} className="aspect-square rounded-3xl md:sticky md:top-6" />
+        <ProductImage
+          categorySlug={category?.slug ?? ""}
+          imagePath={product.image_path}
+          alt={product.name}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          className="aspect-square rounded-3xl md:sticky md:top-6"
+        />
 
         <section aria-labelledby="product-title">
           <div className="flex min-h-6 flex-wrap gap-2">

@@ -10,7 +10,7 @@ export function ProductCard({ product, settings }: { product: ProductCardData; s
 
   return (
     <article className="relative flex h-full flex-col rounded-2xl border border-line bg-surface p-3 transition-colors hover:border-brand/50">
-      <ProductImage categorySlug={categorySlug} className="aspect-[16/9] rounded-xl" />
+      <ProductImage categorySlug={categorySlug} imagePath={product.image_path} className="aspect-[16/9] rounded-xl" />
       <div className="mt-3 flex min-h-6 flex-wrap items-center gap-2">
         <RxBadge rxClass={product.rx_class} />
         <StockNote inStock={product.in_stock} />

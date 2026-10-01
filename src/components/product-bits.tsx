@@ -2,7 +2,9 @@ import { formatKes } from "@/lib/domain/money";
 import { productAction, showPrice, type RxClass } from "@/lib/domain/product-rules";
 import { whatsappUrl } from "@/lib/domain/contact";
 import { fillTemplate } from "@/lib/domain/template";
+import Image from "next/image";
 import type { CartProduct } from "@/lib/cart/cart-logic";
+import { productImageUrl } from "@/lib/images";
 import type { Settings } from "@/lib/settings/schema";
 import { SITE_URL } from "@/lib/site";
 import { CategoryIcon, WhatsAppIcon } from "./icons";
@@ -53,8 +55,30 @@ export function Price({
   );
 }
 
-/** Placeholder "packshot" until product photos are uploaded: the category mark on a tinted tile. */
-export function ProductImage({ categorySlug, className = "" }: { categorySlug: string; className?: string }) {
+/**
+ * Product photo from Storage, resized by next/image. Without a photo: the category mark on a tinted
+ * tile. The tile keeps its aspect ratio either way, so nothing shifts while images load.
+ */
+export function ProductImage({
+  categorySlug,
+  imagePath,
+  alt,
+  sizes,
+  className = "",
+}: {
+  categorySlug: string;
+  imagePath?: string | null;
+  alt?: string;
+  sizes?: string;
+  className?: string;
+}) {
+  if (imagePath) {
+    return (
+      <div className={`relative overflow-hidden bg-mist ${className}`}>
+        <Image src={productImageUrl(imagePath)} alt={alt ?? ""} fill sizes={sizes ?? "(min-width: 1024px) 25vw, 50vw"} className="object-contain p-2" />
+      </div>
+    );
+  }
   return (
     <div className={`flex items-center justify-center bg-mist text-brand/70 ${className}`}>
       <CategoryIcon slug={categorySlug} className="h-2/5 w-auto" strokeWidth={1.2} />

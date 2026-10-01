@@ -104,6 +104,20 @@ body:has([data-home-search]) [data-header-search] {
   }
 }
 
+/* Admin save confirmation: fades in next to the button. */
+@keyframes status-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .admin-status {
+    animation: status-in 200ms ease-out;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

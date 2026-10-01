@@ -2,7 +2,7 @@
 -- Everything runs in one transaction that is rolled back, so the database is unchanged afterwards.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(27);
 
 -- ---------------------------------------------------------------- fixtures (as the postgres superuser)
 
@@ -45,6 +45,7 @@ select lives_ok(format($$
   :area_id, :gen_id, :gen_price, :p_id, :p_price, :gen_id, :gen_price), 'valid order is accepted');
 
 select isnt((select order_number from placed), null, 'order gets a number');
+select public_token as placed_token from placed \gset
 
 -- Customer confirmation page via the token
 select is((public.order_by_token((select public_token from placed)) ->> 'total_kes')::int,
@@ -102,6 +103,14 @@ set local request.jwt.claims = '{"sub": "00000000-0000-0000-0000-00000000a002", 
 
 select ok((select count(*) from public.orders) >= 2, 'staff can read orders');
 select throws_ok('update public.orders set total_kes = 1', '42501', null, 'staff cannot change order amounts');
+
+-- Status workflow (trigger): new → confirmed → completed, no skipping, no going back
+select throws_ok(format('update public.orders set status = ''completed'' where public_token = %L', :'placed_token'),
+  'P0001', 'invalid_status_change', 'a new order cannot jump straight to completed');
+select lives_ok(format('update public.orders set status = ''confirmed'' where public_token = %L', :'placed_token'),
+  'a new order can be confirmed');
+select throws_ok(format('update public.orders set status = ''new'' where public_token = %L', :'placed_token'),
+  'P0001', 'invalid_status_change', 'a confirmed order cannot go back to new');
 
 select * from finish();
 rollback;

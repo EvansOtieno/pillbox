@@ -58,6 +58,14 @@ describe("settingsFromRows (reading from the database)", () => {
   });
 });
 
+describe("admin settings fields", () => {
+  it("lists every setting exactly once, so none is missing from the admin", async () => {
+    const { SETTING_FIELDS } = await import("@/lib/settings/fields");
+    const { settingKeys } = await import("@/lib/settings/schema");
+    expect(SETTING_FIELDS.map((f) => f.key).sort()).toEqual([...settingKeys].sort());
+  });
+});
+
 describe("fillTemplate", () => {
   it("replaces known placeholders and leaves unknown ones visible", () => {
     expect(fillTemplate("Hello {store}, about {product} {oops}", { store: "Afya Corner", product: "Zinc" })).toBe(

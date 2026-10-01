@@ -89,6 +89,22 @@ page can't know the current time.
 - **Confirmation** (`/order/[token]`) is the one uncached page: it reads the order at request time (`connection()`)
   inside `<Suspense>`, builds the WhatsApp message with `orderMessage()` and shows it as a preview.
 
+### Admin (Milestone 4)
+- **Three layers of security**, outermost first:
+  1. `src/proxy.ts` (a Servlet filter): refreshes the session cookie and sends signed-out visitors to `/admin/login`.
+  2. `requireStaff()` / `requireOwner()` in `src/lib/admin/auth.ts` (`@PreAuthorize`): called at the top of **every**
+     admin page **and every Server Action**, because each action is its own HTTP endpoint.
+  3. RLS in Postgres: even a bug in 1 or 2 can't let staff change settings or rewrite an order's total.
+- **Order workflow** (new → confirmed → completed, or cancelled) is a `BEFORE UPDATE` trigger, like a PL/SQL
+  trigger raising an application error. The admin buttons only offer valid moves; the trigger guarantees them.
+- **Saving refreshes the shop:** admin actions call `updateTag('catalogue')` (and `product:<slug>`, `settings`, …).
+  The next visitor gets freshly rendered pages; nothing else is rebuilt.
+- **Photos:** the browser uploads straight to Supabase Storage with the staff session (Storage RLS: staff only), then a
+  Server Action records the path. `next/image` resizes them.
+- **Local logins:** `scripts/test-users.ts` → `supabase/seed.test-users.sql` (owner + staff, local database only).
+- Gotcha: with Cache Components every admin section needs its own `loading.tsx` (a Suspense boundary), or moving
+  between sections blocks while the per-user data loads.
+
 ## 6. Supabase in one paragraph
 Supabase is a Postgres database plus services around it: **Auth** (GoTrue: sign-in, issues a JWT),
 **PostgREST** (the HTTP API over your schema), **Storage** (S3-like buckets for product images), and **Studio**
